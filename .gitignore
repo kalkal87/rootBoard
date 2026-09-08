@@ -1,0 +1,19 @@
+# Local Claude worktree metadata; the actual ticket branches are pushed separately.
+.claude/worktrees/
+.worktrees/
+.superpowers/
+
+# Python test/import caches.
+__pycache__/
+*.py[cod]
+
+# Local machine and dependency artifacts.
+.DS_Store
+.env
+.env.*
+!.env.example
+node_modules/
+*.log
+
+# Opt-in project-local rootBoard runs can contain private transcripts.
+rootboard-runs/

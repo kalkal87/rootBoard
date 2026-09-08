@@ -1,0 +1,1173 @@
+/* Stacked-sticky-note whiteboard styling.
+   Self-contained: no network-dependent fonts, icons, or frameworks. The brand
+   mark image is a base64 data: URI set inline in whiteboard.js so the artifact
+   still opens correctly with no network access. */
+
+:root {
+  --board-bg: #eef1f4;
+  --board-dot: #d7dce2;
+  --ink: #2b2b2b;
+  --ink-soft: #5a5a5a;
+  --chrome-ink: #2b2b2b;
+  --chrome-ink-soft: #5a5a5a;
+  --toolbar-bg: #ffffff;
+  --toolbar-border: #d7dce2;
+  --accent: #3b6fd6;
+  --accent-ring: #3b6fd6;
+  --card-focus-ring: #2456a6;
+  --focus-active-bg: #3b6fd6;
+  --focus-active-ink: #ffffff;
+  --danger: #c0392b;
+  --sticky-ink: #18202b;
+  --sticky-impact-ink: #3d4652;
+  --disclosure-focus-ring: #2456a6;
+  --tension-edge: #624700;
+  --wave-vivid-blue-paper: #dae4fa;
+  --wave-vivid-blue-accent: #3d7bfa;
+  --wave-vivid-blue-label: #2451ad;
+  --wave-coral-paper: #fcdfd5;
+  --wave-coral-accent: #ff6b57;
+  --wave-coral-label: #9b3327;
+  --wave-warm-yellow-paper: #fdeab9;
+  --wave-warm-yellow-accent: #ffc83d;
+  --wave-warm-yellow-label: #725200;
+  --wave-deep-navy-paper: #aab9d0;
+  --wave-deep-navy-accent: #0f2341;
+  --wave-deep-navy-label: #0f2341;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --board-bg: #1c1e22;
+    --board-dot: #2c2f34;
+    --ink: #1f1f1f;
+    --ink-soft: #444;
+    --chrome-ink: #f0f2f5;
+    --chrome-ink-soft: #c7cbd1;
+    --toolbar-bg: #26292e;
+    --toolbar-border: #383c42;
+    --accent: #6d9bff;
+    --accent-ring: #6d9bff;
+    --card-focus-ring: #3b6fd6;
+    --focus-active-bg: #3b6fd6;
+    --focus-active-ink: #ffffff;
+  }
+  body {
+    color: #e8e8e8;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+}
+
+body {
+  overflow: hidden;
+  background: var(--board-bg);
+}
+
+.board-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  height: 52px;
+  gap: 10px;
+  padding: 0 16px;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--toolbar-border);
+}
+
+.board-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+.board-brand img {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  display: block;
+}
+
+.board-brand .wordmark {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+  font-weight: 650;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: var(--chrome-ink);
+  white-space: nowrap;
+}
+
+.board-toolbar h1 {
+  min-width: 0;
+  flex: 1 1 auto;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--chrome-ink);
+  white-space: nowrap;
+  border-radius: 4px;
+  cursor: text;
+  outline: none;
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.board-toolbar h1:hover {
+  background: color-mix(in srgb, var(--chrome-ink) 6%, transparent);
+}
+
+.board-toolbar h1:focus {
+  background: color-mix(in srgb, var(--chrome-ink) 6%, transparent);
+  box-shadow: 0 0 0 2px var(--accent-ring);
+  text-overflow: clip;
+}
+
+.copy-context {
+  flex: none;
+  border: 1px solid var(--toolbar-border);
+  border-radius: 7px;
+  padding: 6px 10px;
+  background: transparent;
+  color: var(--chrome-ink);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.copy-context:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+.copy-context:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.copy-context:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+}
+
+.board-divider {
+  width: 1px;
+  height: 22px;
+  flex: none;
+  background: var(--toolbar-border);
+}
+
+.board-status {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 9px;
+  margin-left: 8px;
+}
+
+.board-status[hidden],
+.focus-status-indicator[hidden],
+.focus-clear[hidden] {
+  display: none;
+}
+
+.focus-status-text {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--chrome-ink-soft);
+}
+
+.focus-status-indicator {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.focus-status-compact {
+  display: none;
+}
+
+.focus-clear {
+  border: none;
+  border-radius: 7px;
+  padding: 5px 8px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.focus-clear:hover:not(:disabled) {
+  background: rgba(59, 111, 214, 0.03);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.focus-clear:disabled,
+.focus-clear[hidden] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.focus-clear:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .board-toolbar {
+    gap: 6px;
+    padding: 0 10px;
+  }
+  .board-brand {
+    gap: 6px;
+  }
+  .board-status {
+    gap: 5px;
+    margin-left: 4px;
+  }
+  .focus-status-full {
+    display: none;
+  }
+  .focus-status-compact {
+    display: inline;
+  }
+  .focus-clear {
+    padding: 4px 6px;
+  }
+  .copy-context {
+    padding: 6px 8px;
+  }
+}
+
+.board-canvas {
+  position: absolute;
+  top: 52px;
+  /* Leaves room for the fixed side panel so it never sits over cards or
+     zones that start near the canvas's own left edge. */
+  left: 72px;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  background-image: radial-gradient(var(--board-dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+  cursor: grab;
+}
+
+.board-canvas.panning {
+  cursor: grabbing;
+}
+
+/* Sized in script to content-size × zoom -- this is what overflow:auto
+   actually measures for its scrollbars, since a transform on the content
+   layer below (board-canvas-inner) changes how it paints but not how it
+   lays out. Without this layer, zooming in would paint cards the browser
+   has no scroll room to reach. */
+.board-canvas-sizer {
+  position: relative;
+  width: 3600px;
+  height: 2400px;
+}
+
+.board-canvas-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3600px;
+  height: 2400px;
+  transform-origin: 0 0;
+}
+
+.board-empty {
+  position: absolute;
+  top: 120px;
+  left: 60px;
+  color: var(--ink-soft);
+  font-size: 14px;
+  max-width: 320px;
+}
+
+/* --- Freeform text labels --- */
+
+.board-label {
+  position: absolute;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  min-width: 140px;
+  max-width: 560px;
+  min-height: 46px;
+  gap: 4px;
+  padding: 7px 8px 7px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--chrome-ink);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.board-label:hover,
+.board-label:focus-within {
+  background: var(--toolbar-bg);
+  border-color: var(--toolbar-border);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.board-label.dragging {
+  z-index: 40;
+  cursor: grabbing;
+}
+
+.board-label-text {
+  min-width: 100px;
+  max-width: 500px;
+  overflow: hidden;
+  color: inherit;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: text;
+  user-select: text;
+  touch-action: auto;
+}
+
+.board-label-text:empty::before {
+  content: attr(data-placeholder);
+  color: var(--chrome-ink-soft);
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+.board-label-text:focus {
+  outline: none;
+}
+
+.board-label:focus-within {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+}
+
+.board-label-delete {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--chrome-ink-soft);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.board-label:hover .board-label-delete,
+.board-label:focus-within .board-label-delete,
+.board-label-delete:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.board-label-delete:hover {
+  background: rgba(192, 57, 43, 0.12);
+  color: var(--danger);
+}
+
+.board-label-delete:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 1px;
+}
+
+/* --- Card --- */
+
+.card {
+  position: absolute;
+  width: 300px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.16s ease;
+}
+
+.card.dragging {
+  cursor: grabbing;
+  z-index: 40;
+  transition: none !important;
+}
+
+.card.merge-source-completing {
+  opacity: 0;
+  transform: translate(var(--merge-travel-x), var(--merge-travel-y)) scale(0.72) !important;
+  transition: opacity 0.2s ease, transform 0.2s ease !important;
+}
+
+.card[data-wave="vivid-blue"] {
+  --sticky-paper: var(--wave-vivid-blue-paper);
+  --sticky-accent: var(--wave-vivid-blue-accent);
+  --sticky-label: var(--wave-vivid-blue-label);
+}
+
+.card[data-wave="coral"] {
+  --sticky-paper: var(--wave-coral-paper);
+  --sticky-accent: var(--wave-coral-accent);
+  --sticky-label: var(--wave-coral-label);
+}
+
+.card[data-wave="warm-yellow"] {
+  --sticky-paper: var(--wave-warm-yellow-paper);
+  --sticky-accent: var(--wave-warm-yellow-accent);
+  --sticky-label: var(--wave-warm-yellow-label);
+}
+
+.card[data-wave="deep-navy"] {
+  --sticky-paper: var(--wave-deep-navy-paper);
+  --sticky-accent: var(--wave-deep-navy-accent);
+  --sticky-label: var(--wave-deep-navy-label);
+}
+
+.sticky {
+  position: relative;
+  padding: 28px 24px 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+  background: var(--sticky-paper);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sticky-ink);
+  transition: box-shadow 0.16s ease, outline-color 0.12s ease;
+}
+
+.merge-progress-ring {
+  position: absolute;
+  inset: -7px;
+  z-index: 3;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.merge-progress-ring svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.merge-progress-fill {
+  fill: none;
+  stroke: var(--accent-ring);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.card.merge-target .sticky {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 3px;
+  animation: merge-halo-pulse 0.75s ease-in-out alternate infinite;
+}
+
+.card.merge-target .merge-progress-ring {
+  visibility: visible;
+  opacity: 1;
+}
+
+.card.merge-target .merge-progress-fill {
+  animation: merge-progress-fill 1.5s linear forwards;
+}
+
+.card.merge-target-completing .sticky {
+  transform: translateY(-5px) scale(1.025);
+  transition: transform 0.2s ease;
+}
+
+@keyframes merge-progress-fill {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes merge-halo-pulse {
+  from {
+    outline-width: 1px;
+    outline-offset: 2px;
+  }
+  to {
+    outline-width: 3px;
+    outline-offset: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card.merge-source-completing {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .card.merge-target .sticky,
+  .card.merge-target-completing .sticky {
+    animation: none;
+    transform: none;
+    transition: none;
+  }
+}
+
+.sticky::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  width: 32px;
+  height: 32px;
+  background: var(--sticky-accent);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  border-radius: 0 10px 0 0;
+  box-shadow: -2px 2px 3px rgba(0, 0, 0, 0.16);
+  pointer-events: none;
+}
+
+/* Fanned stack layers peeking out behind the top note */
+.stack-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: var(--sticky-paper);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.20);
+  z-index: -1;
+}
+
+.card .card-toolbar {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.card:hover .card-toolbar,
+.card:focus-within .card-toolbar {
+  opacity: 1;
+}
+
+.icon-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #fff;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.icon-btn.delete {
+  color: var(--danger);
+}
+
+.card-field {
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 3px;
+  margin: -2px -3px;
+}
+
+.card-field:focus {
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+.card-field.placeholder {
+  color: rgba(0, 0, 0, 0.4);
+  font-style: italic;
+}
+
+.signal-label,
+.card-label {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sticky-label);
+}
+
+.problem-statement {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.problem-statement + .card-label {
+  margin-top: 20px;
+}
+
+.impact-copy {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--sticky-impact-ink);
+}
+
+.proof-points {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.proof-points li {
+  margin-bottom: 3px;
+}
+
+.proof-points li::marker {
+  color: var(--sticky-accent);
+}
+
+.framework-entry li::marker {
+  color: var(--sticky-accent);
+}
+
+.proof-point-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.proof-point-row .card-field {
+  flex: 1;
+}
+
+.remove-point {
+  border: none;
+  background: none;
+  color: var(--sticky-label);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  padding: 1px 2px;
+}
+
+.remove-point:hover {
+  color: var(--sticky-ink);
+}
+
+.add-point-btn {
+  border: none;
+  background: none;
+  color: var(--sticky-label);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 0 0;
+}
+
+.framework-entry {
+  margin-bottom: 6px;
+}
+
+.framework-entry .fw-name {
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.framework-entry ul {
+  margin: 2px 0 0;
+  padding-left: 14px;
+  font-size: 11.5px;
+}
+
+.convergence-note {
+  margin-top: 4px;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--sticky-impact-ink);
+}
+
+.disclosure-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 13px 14px;
+  border: 1px solid color-mix(in srgb, var(--sticky-accent) 28%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sticky-ink);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.disclosure-toggle:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sticky-accent) 8%, transparent);
+}
+
+.disclosure-toggle:focus-visible {
+  outline: 3px solid var(--disclosure-focus-ring);
+  outline-offset: 2px;
+}
+
+.disclosure-toggle:disabled {
+  opacity: 1;
+  color: var(--sticky-ink);
+  cursor: default;
+}
+
+.disclosure-toggle:disabled:hover {
+  background: transparent;
+}
+
+.disclosure-chevron {
+  color: var(--sticky-accent);
+  transition: transform 0.16s ease;
+}
+
+.disclosure-toggle[aria-expanded="true"] .disclosure-chevron {
+  transform: rotate(90deg);
+}
+
+.disclosure-panel {
+  margin-top: -8px;
+  padding: 16px 14px 13px;
+  border: 1px solid color-mix(in srgb, var(--sticky-accent) 28%, transparent);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  color: var(--sticky-impact-ink);
+  font-size: 12px;
+  line-height: 1.5;
+  transition: border-color 0.16s ease;
+}
+
+.disclosure-panel[hidden] {
+  display: none;
+}
+
+/* --- Convergence weight: deeper shadow the more lenses agree. Reinforces,
+   rather than duplicates, the confidence dot count below. --- */
+
+.card[data-convergence="partial"] .sticky {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+.card[data-convergence="partial"] .stack-layer {
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.24);
+}
+.card[data-convergence="strong"] .sticky {
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.34);
+}
+.card[data-convergence="strong"] .stack-layer {
+  box-shadow: 0 9px 22px rgba(0, 0, 0, 0.28);
+}
+
+/* --- Confidence: a labeled row of dots, one per contributing framework
+   (so the count echoes the stack depth above), each dot's own fill
+   showing that framework's confidence. --- */
+
+.signal-block {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 0 0 20px;
+}
+
+.signal-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.signal-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1.5px solid var(--sticky-accent);
+  outline: 1px solid var(--sticky-ink);
+  background: transparent;
+  box-sizing: border-box;
+  cursor: help;
+}
+
+.signal-dot[data-confidence="high"] {
+  background: var(--sticky-accent);
+}
+
+.signal-dot[data-confidence="medium"] {
+  background: linear-gradient(90deg, var(--sticky-accent) 50%, transparent 50%);
+}
+
+.signal-dot[data-confidence="low"] {
+  border-color: var(--sticky-accent);
+  background: radial-gradient(circle, var(--sticky-accent) 28%, transparent 30%);
+}
+
+.signal-dot[data-confidence="unknown"] {
+  border-style: dashed;
+}
+
+.signal-more {
+  font-size: 10px;
+  color: var(--sticky-label);
+}
+
+/* --- Tension: one global dashed semantic edge, independent of the wave
+   accent and separate from the confidence dots above. --- */
+
+.sticky[data-tension="true"] {
+  border-bottom: 4px dashed var(--tension-edge);
+}
+
+/* --- Theme zones (clustering) ---
+   Deliberately background: a soft tinted region with a dashed edge and a
+   small label, sitting behind the cards in DOM order. The pattern should be
+   visible at a glance without ever pulling focus away from the cards. */
+
+.zone {
+  position: absolute;
+  border-radius: 28px;
+  border: 1.5px dashed;
+  pointer-events: none;
+  transition: left 0.4s ease, top 0.4s ease, width 0.4s ease,
+    height 0.4s ease;
+}
+
+.zone-label {
+  position: absolute;
+  top: 10px;
+  left: 16px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--ink-soft);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  .zone-label {
+    background: rgba(38, 41, 46, 0.85);
+    color: #c7c9cc;
+  }
+}
+
+/* --- Permanent side panel ---
+   Compact Add and canvas-level view controls, separate from the board
+   context so the working tools stay out of the title bar. */
+
+.side-panel {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  background: var(--toolbar-bg);
+  border: 1px solid var(--toolbar-border);
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.side-panel-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  font-family: inherit;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--chrome-ink-soft);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.side-panel-divider {
+  width: 24px;
+  height: 1px;
+  margin: 1px auto;
+  background: var(--toolbar-border);
+}
+
+.side-panel-btn:focus-visible {
+  outline: 3px solid var(--accent-ring);
+  outline-offset: 2px;
+}
+
+.side-panel-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  z-index: 2;
+  padding: 7px 9px;
+  border-radius: 6px;
+  background: #24292f;
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-4px, -50%);
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
+}
+
+.side-panel-btn:hover::after,
+.side-panel-btn:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, -50%);
+}
+
+.side-panel-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.side-panel-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  .side-panel-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.side-panel-btn[data-action="add"] {
+  background: var(--accent);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.side-panel-btn[data-action="text"] {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+@media (prefers-color-scheme: dark) {
+  .side-panel-btn[data-action="add"] {
+    color: #1f1f1f;
+  }
+}
+
+.side-panel-btn.active {
+  background: var(--focus-active-bg);
+  color: var(--focus-active-ink);
+}
+
+.side-panel-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.side-panel-btn:disabled:hover {
+  background: transparent;
+}
+
+.side-panel-btn.active:disabled {
+  background: var(--focus-active-bg);
+}
+
+/* --- Focus spotlight --- */
+
+.card.focus-focused {
+  z-index: 5;
+}
+
+.card.focus-focused.dragging {
+  z-index: 40;
+}
+
+.card.focus-focused .sticky {
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
+}
+
+.card.focus-focused[data-convergence="partial"] .sticky {
+  box-shadow: 0 17px 36px rgba(0, 0, 0, 0.36);
+}
+
+.card.focus-focused[data-convergence="strong"] .sticky {
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.40);
+}
+
+.card.focus-selectable {
+  cursor: pointer;
+}
+
+.card.focus-dimmed {
+  opacity: 0.22;
+  cursor: pointer;
+}
+
+.card.focus-dimmed:hover {
+  opacity: 0.58;
+}
+
+.card.focus-dimmed:focus-visible {
+  opacity: 1;
+}
+
+.card.focus-selectable:hover .sticky,
+.card.focus-selectable:focus-visible .sticky,
+.card.focus-dimmed:hover .sticky,
+.card.focus-dimmed:focus-visible .sticky {
+  outline: 2px dashed var(--card-focus-ring);
+  outline-offset: 3px;
+}
+
+.focus-remove {
+  width: 30px;
+  height: 30px;
+  margin: -4px;
+  border-color: transparent;
+  background: transparent;
+  opacity: 0.72;
+  color: var(--ink-soft);
+}
+
+.focus-remove::before {
+  content: "−";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.focus-remove:hover,
+.focus-remove:focus-visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .sticky,
+  .disclosure-toggle,
+  .disclosure-chevron,
+  .disclosure-panel {
+    transition: none;
+  }
+}
+
+/* --- Zoom controls ---
+   Floating bottom-right, the conventional spot for view-navigation controls
+   (distinct from the side panel, which edits the board's content layout). */
+
+.zoom-controls {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: var(--toolbar-bg);
+  border: 1px solid var(--toolbar-border);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.zoom-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.zoom-level {
+  min-width: 44px;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 2px;
+  border-radius: 7px;
+}
+
+.zoom-btn:hover,
+.zoom-level:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  .zoom-btn,
+  .zoom-level {
+    color: #e8e8e8;
+  }
+  .zoom-level {
+    color: #c7c9cc;
+  }
+  .zoom-btn:hover,
+  .zoom-level:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}

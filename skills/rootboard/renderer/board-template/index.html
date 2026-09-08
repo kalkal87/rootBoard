@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Problem Board</title>
+    <link rel="stylesheet" href="../whiteboard/whiteboard.css" />
+  </head>
+  <body>
+    <div id="board-root"></div>
+
+    <!--
+      BOARD CONTEXT INJECTION POINT
+
+      Whatever produces a run (the synthesizer output, or a hand-written
+      fixture) must replace the object below with real board data shaped
+      per contracts/board-output.md, then this file becomes that run's
+      final whiteboard artifact.
+
+      Replace the entire `__BOARD_DATA__` object, including the
+      surrounding braces, with the JSON to render. Replace
+      `__SYNTHESIS_MARKDOWN__` with the JSON-encoded contents of the run's
+      synthesis.md. Do not rename either window property — the renderer
+      mount below looks for these exact names.
+    -->
+    <script>
+      window.BOARD_DATA = __BOARD_DATA__;
+      window.SYNTHESIS_MARKDOWN = __SYNTHESIS_MARKDOWN__;
+    </script>
+    <script src="../whiteboard/whiteboard-core.js"></script>
+    <script src="../whiteboard/whiteboard.js"></script>
+    <script>
+      ProblemBoard.mount(
+        window.BOARD_DATA,
+        document.getElementById("board-root"),
+        { synthesisMarkdown: window.SYNTHESIS_MARKDOWN }
+      );
+    </script>
+  </body>
+</html>

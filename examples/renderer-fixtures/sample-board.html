@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Problem Board — Sample Fixture</title>
+    <link rel="stylesheet" href="../../skills/rootboard/renderer/whiteboard/whiteboard.css" />
+  </head>
+  <body>
+    <div id="board-root"></div>
+
+    <!--
+      This file is skills/rootboard/renderer/board-template/index.html with the
+      __BOARD_DATA__ placeholder replaced by examples/renderer-fixtures/sample-board.json.
+      It exists so the fixture can be opened directly in a browser with no
+      build step or local server (avoids file:// fetch/CORS restrictions).
+    -->
+    <script>
+      window.BOARD_DATA = {
+        "board_title": "Q3 Activation Drop — Team Retro Analysis",
+        "generated_at": "2026-08-20T15:00:00Z",
+        "source_summary": "45-minute team retro transcript about the Q3 activation dip",
+        "cards": [
+          {
+            "id": "card-01",
+            "problem_statement": "Users abandon onboarding at the integration step, not the signup step.",
+            "impact": "Activation dropped 18% in Q3 even though signups held steady, which is masking the real problem as a top-of-funnel issue.",
+            "proof_points": [
+              "3 of 5 churned accounts in the transcript stalled at 'connect your data source'.",
+              "Support tickets tagged 'setup' rose 40% quarter over quarter."
+            ],
+            "frameworks": [
+              {
+                "name": "Jobs to Be Done",
+                "proof_points": [
+                  "Users describe the integration step as 'someone else's job', suggesting a handoff gap."
+                ],
+                "confidence": "High"
+              },
+              {
+                "name": "Funnel Analysis",
+                "proof_points": [
+                  "3 of 5 churned accounts in the transcript stalled at 'connect your data source'."
+                ],
+                "confidence": "High"
+              }
+            ],
+            "position": { "x": 380, "y": 160 },
+            "convergence_note": "Both lenses independently pointed at the integration step rather than signup, despite the team framing this as a signup problem.",
+            "created_by": "agent",
+            "tags": ["activation", "onboarding"]
+          },
+          {
+            "id": "card-02",
+            "problem_statement": "No single team owns the integration step end-to-end.",
+            "impact": "Fixes stall because Support, Product, and Eng each think the other owns the setup experience.",
+            "proof_points": [
+              "Support lead says 'we just file the ticket, product usually reprioritizes it away'.",
+              "Eng says the integration UI has had no owner since the last reorg in Q1."
+            ],
+            "frameworks": [
+              {
+                "name": "Stakeholder Mapping",
+                "proof_points": [
+                  "Support lead says 'we just file the ticket, product usually reprioritizes it away'.",
+                  "Eng says the integration UI has had no owner since the last reorg in Q1."
+                ]
+              }
+            ],
+            "position": { "x": 700, "y": 440 },
+            "convergence_note": "",
+            "created_by": "agent",
+            "tags": ["ownership"]
+          },
+          {
+            "id": "card-03",
+            "problem_statement": "The team is optimizing signup conversion, a metric that is no longer the bottleneck.",
+            "impact": "Roadmap effort keeps going into signup-flow polish while the real leak downstream goes unaddressed.",
+            "proof_points": [
+              "Q3 planning doc lists three signup-flow experiments and zero integration-flow experiments."
+            ],
+            "frameworks": [
+              {
+                "name": "Systems Thinking",
+                "proof_points": [
+                  "Q3 planning doc lists three signup-flow experiments and zero integration-flow experiments."
+                ]
+              }
+            ],
+            "position": { "x": 120, "y": 460 },
+            "convergence_note": "",
+            "created_by": "agent",
+            "tags": ["strategy", "blind-spot"]
+          },
+          {
+            "id": "card-04",
+            "problem_statement": "Leadership incentives reward shipping new features over fixing retention leaks.",
+            "impact": "Even when a team identifies a retention problem correctly, it loses out to feature work in prioritization because that is what gets recognized.",
+            "proof_points": [
+              "PM says 'retention fixes don't show up in the launch recap deck'.",
+              "Last two quarters' promo packets cited feature launches, not retention saves.",
+              "Roadmap review meeting spent 40 minutes on new features, 4 minutes on the activation dip."
+            ],
+            "frameworks": [
+              {
+                "name": "Five Whys",
+                "proof_points": [
+                  "Chain of 'why' answers traces the activation dip back to 'retention work isn't prioritized', not to a UX defect."
+                ],
+                "confidence": "High"
+              },
+              {
+                "name": "Systems Thinking",
+                "proof_points": [
+                  "Roadmap review meeting spent 40 minutes on new features, 4 minutes on the activation dip."
+                ],
+                "confidence": "High"
+              },
+              {
+                "name": "Stakeholder Mapping",
+                "proof_points": [
+                  "PM says 'retention fixes don't show up in the launch recap deck'.",
+                  "Last two quarters' promo packets cited feature launches, not retention saves."
+                ],
+                "confidence": "High"
+              }
+            ],
+            "position": { "x": 980, "y": 140 },
+            "convergence_note": "Three independent lenses converged on an incentive-structure root cause, well upstream of anything the team discussed fixing directly.",
+            "created_by": "agent",
+            "tags": ["incentives", "blind-spot"]
+          }
+        ]
+      };
+    </script>
+    <script src="../../skills/rootboard/renderer/whiteboard/whiteboard-core.js"></script>
+    <script src="../../skills/rootboard/renderer/whiteboard/whiteboard.js"></script>
+    <script>
+      ProblemBoard.mount(window.BOARD_DATA, document.getElementById("board-root"));
+    </script>
+  </body>
+</html>

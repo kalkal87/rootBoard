@@ -1,0 +1,9 @@
+interface:
+  display_name: "rootBoard"
+  short_description: "Find root problems in transcripts and context dumps"
+  icon_small: "./assets/logo-toolbar.png"
+  icon_large: "./assets/logo.png"
+  default_prompt: "Use $rootboard to find the underlying problems in this transcript or context dump and produce an editable whiteboard."
+
+policy:
+  allow_implicit_invocation: true
